@@ -19,14 +19,8 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Key,
-  ShieldCheck,
-  Languages,
   Inbox,
-  Sparkles,
-  Users,
   Crown,
-  Building2,
-  CheckCircle2,
   Menu
 } from 'lucide-react';
 import { Avatar, Badge } from '../ui/Card';

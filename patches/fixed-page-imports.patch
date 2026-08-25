@@ -1,0 +1,93 @@
+diff --git a/src/app/page.tsx b/src/app/page.tsx
+--- a/src/app/page.tsx
++++ b/src/app/page.tsx
+@@ -5,1 +5,1 @@
+-import { ArrowRight, CheckCircle2, Shield, Users, Target, Trophy, Flame } from 'lucide-react';
++import { ArrowRight, Shield, Users, Target } from 'lucide-react';
+
+diff --git a/src/components/layout/AppShell.tsx b/src/components/layout/AppShell.tsx
+--- a/src/components/layout/AppShell.tsx
++++ b/src/components/layout/AppShell.tsx
+@@ -6,26 +6,18 @@
+-import {
+-  Home,
+-  Compass,
+-  Target,
+-  Activity,
+-  MessageSquare,
+-  Trophy,
+-  ShieldAlert,
+-  Moon,
+-  Sun,
+-  Wifi,
+-  WifiOff,
+-  Bell,
+-  PanelLeftClose,
+-  PanelLeftOpen,
+-  Key,
+-  ShieldCheck,
+-  Languages,
+-  Inbox,
+-  Sparkles,
+-  Users,
+-  Crown,
+-  Building2,
+-  CheckCircle2,
+-  Menu
+-} from 'lucide-react';
++import {
++  Home,
++  Compass,
++  Target,
++  Activity,
++  MessageSquare,
++  Trophy,
++  ShieldAlert,
++  Moon,
++  Sun,
++  Wifi,
++  WifiOff,
++  Bell,
++  PanelLeftClose,
++  PanelLeftOpen,
++  Key,
++  Inbox,
++  Crown,
++  Menu
++} from 'lucide-react';
+
+diff --git a/src/app/home/page.tsx b/src/app/home/page.tsx
+--- a/src/app/home/page.tsx
++++ b/src/app/home/page.tsx
+@@ -5,19 +5,10 @@
+-import {
+-  CheckCircle2,
+-  Flame,
+-  Plus,
+-  ArrowRight,
+-  TrendingUp,
+-  Clock,
+-  Upload,
+-  Calendar,
+-  Sparkles,
+-  Users,
+-  Award,
+-  ShieldCheck,
+-  EyeOff,
+-  FileImage,
+-  AlertCircle,
+-  Coins,
+-  Share2
+-} from 'lucide-react';
++import {
++  CheckCircle2,
++  Flame,
++  Plus,
++  TrendingUp,
++  Upload,
++  Calendar,
++  Sparkles,
++  Users,
++  EyeOff,
++  FileImage
++} from 'lucide-react';

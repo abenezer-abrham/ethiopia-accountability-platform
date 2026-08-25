@@ -6,20 +6,13 @@ import {
   CheckCircle2,
   Flame,
   Plus,
-  ArrowRight,
   TrendingUp,
-  Clock,
   Upload,
   Calendar,
   Sparkles,
   Users,
-  Award,
-  ShieldCheck,
   EyeOff,
-  FileImage,
-  AlertCircle,
-  Coins,
-  Share2
+  FileImage
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, Badge, Avatar } from '@/components/ui/Card';

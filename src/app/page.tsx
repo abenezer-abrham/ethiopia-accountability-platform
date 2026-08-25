@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, Shield, Users, Target, Trophy, Flame } from 'lucide-react';
+import { ArrowRight, Shield, Users, Target } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, Badge } from '@/components/ui/Card';
 
@@ -100,7 +100,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-slate-800/80 mt-20 py-8 text-center text-xs text-slate-500">
-        <p>© 2026 Egna (እኛ) — Ethiopia Accountability, Learning & Community Platform</p>
+        <p>© {new Date().getFullYear()} Egna (እኛ) — Ethiopia Accountability, Learning & Community Platform</p>
       </footer>
     </div>
   );

@@ -1,0 +1,6 @@
+diff --git a/src/app/page.tsx b/src/app/page.tsx
+--- a/src/app/page.tsx
++++ b/src/app/page.tsx
+@@ -103,1 +103,1 @@ export default function LandingPage() {
+-        <p>© 2026 Egna (እኛ) — Ethiopia Accountability, Learning & Community Platform</p>
++        <p>© {new Date().getFullYear()} Egna (እኛ) — Ethiopia Accountability, Learning & Community Platform</p>

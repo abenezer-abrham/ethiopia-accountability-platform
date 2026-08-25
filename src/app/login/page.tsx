@@ -102,18 +102,37 @@ function LoginForm() {
   };
 
   // Quick Demo Login helper
-  const handleQuickDemoLogin = (role: 'ceo' | 'moderator' | 'user') => {
-    if (role === 'ceo') {
-      setEmail('abebe@egna.et');
-      setPassword('ExecutivePassword2026!');
-    } else if (role === 'moderator') {
-      setEmail('meron@egna.et');
-      setPassword('ModeratorPassword2026!');
-    } else {
-      setEmail('samuel@egna.et');
-      setPassword('UserPassword2026!');
+  const handleQuickDemoLogin = async (role: 'ceo' | 'moderator' | 'user') => {
+    setLoading(true);
+    setError('');
+    try {
+      const email = role === 'ceo'
+        ? process.env.NEXT_PUBLIC_DEMO_CEO_EMAIL!
+        : role === 'moderator'
+        ? process.env.NEXT_PUBLIC_DEMO_MOD_EMAIL!
+        : process.env.NEXT_PUBLIC_DEMO_USER_EMAIL!;
+      const password = role === 'ceo'
+        ? process.env.NEXT_PUBLIC_DEMO_CEO_PASSWORD!
+        : role === 'moderator'
+        ? process.env.NEXT_PUBLIC_DEMO_MOD_PASSWORD!
+        : process.env.NEXT_PUBLIC_DEMO_USER_PASSWORD!;
+
+      const { error: demoError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (demoError) {
+        console.warn('Demo login fallback:', demoError.message);
+        router.push(next);
+      } else {
+        router.push(next);
+        router.refresh();
+      }
+    } catch {
+      router.push(next);
+    } finally {
+      setLoading(false);
     }
-    router.push('/home');
   };
 
   return (
