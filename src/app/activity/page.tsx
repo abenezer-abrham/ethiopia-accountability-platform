@@ -29,7 +29,7 @@ export default function ActivityPage() {
         user: user.display_name,
         avatar: user.avatar_url,
         action: 'verified daily routine',
-        detail: routine?.title || c.note,
+        detail: routine?.title || c.note || 'Verified daily habit routine',
         streak: 3,
         time: c.completed_at ? 'Today' : 'Recently',
         type: 'routine',

@@ -30,6 +30,7 @@ import { processOfflineQueue, subscribeQueueChanges, QueuedCheckin } from '@/lib
 import { DICTIONARY, AppLanguage, getStoredLanguage, setStoredLanguage } from '@/lib/i18n';
 import { OfflineQueueModal } from '../ui/OfflineQueueModal';
 import { getCurrentUser, logoutUser } from '@/lib/user-session';
+import { Profile } from '@/lib/types';
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const pathname = usePathname();

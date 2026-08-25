@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { User, ShieldCheck, Flame, Target, MessageSquare, UserPlus, UserCheck, Settings, Award, Globe, Edit3 } from 'lucide-react';

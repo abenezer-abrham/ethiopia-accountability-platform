@@ -121,7 +121,7 @@ export default function OnboardingPage() {
       sub_city: selectedSubCity,
       university_campus: selectedCampus,
       active_window: selectedSchedule,
-      trust_tier: 'tier_1_verified' as const,
+      trust_tier: 'tier_1_new' as const,
       verification_badge: 'none' as const,
       experience_summary: `${selectedInterests[0] || 'Learning'} Practitioner`,
       role: 'user' as const,
