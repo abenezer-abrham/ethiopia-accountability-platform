@@ -58,8 +58,28 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
   const t = DICTIONARY[currentLang] || DICTIONARY.en;
 
-  // Current logged in user (Mocked CEO & Founder for demonstration)
-  const user = INITIAL_PROFILES[0]; // Abebe Kebede (role: ceo_founder)
+  // Current logged in user state (dynamically resolves role or defaults to standard user)
+  const [user, setUser] = useState<Profile>(INITIAL_PROFILES[2]); // Default: Samuel Alemu (role: user)
+
+  useEffect(() => {
+    const syncUser = () => {
+      if (typeof window !== 'undefined') {
+        const storedRole = localStorage.getItem('user_role');
+        if (storedRole === 'ceo_founder') {
+          setUser(INITIAL_PROFILES[0]);
+        } else if (storedRole === 'moderator') {
+          setUser(INITIAL_PROFILES[1]);
+        } else {
+          setUser(INITIAL_PROFILES[2]);
+        }
+      }
+    };
+    syncUser();
+    window.addEventListener('storage', syncUser);
+    return () => window.removeEventListener('storage', syncUser);
+  }, []);
+
+  const isExecutiveOrAdmin = user.role === 'ceo_founder' || user.role === 'moderator' || user.role === 'admin';
 
   useEffect(() => {
     const lang = getStoredLanguage();
@@ -137,7 +157,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
     { label: 'Claim Admin Key', href: '/admin/claim', icon: Key },
   ];
 
-  const isPublicPage = pathname === '/' || pathname === '/signup' || pathname === '/login';
+  const isPublicPage = pathname === '/' || pathname === '/signup' || pathname === '/login' || pathname === '/onboarding';
 
   if (isPublicPage) {
     return (
@@ -253,45 +273,55 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
               </Link>
             );
           })}
-
-          {/* Admin & Security Section */}
-          <div className="pt-6">
-            {!isCollapsed && (
-              <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
-                <span>Executive & Admin</span>
-                <span className="text-[9px] text-amber-400 font-extrabold uppercase">👑 CEO Clearance</span>
-              </div>
-            )}
-
-            {adminNav.map((item) => {
-              const Icon = item.icon;
-              const active = pathname.startsWith(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  title={isCollapsed ? item.label : undefined}
-                  className={`flex items-center justify-between rounded-lg text-sm font-medium transition-all ${
-                    isCollapsed ? 'justify-center p-2.5' : 'px-3 py-2.5'
-                  } ${
-                    active
-                      ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-semibold'
-                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-                  }`}
-                >
-                  <div className="flex items-center space-x-3 min-w-0">
-                    <Icon className="w-5 h-5 shrink-0 text-amber-500" />
-                    {!isCollapsed && <span className="truncate">{item.label}</span>}
-                  </div>
-                  {!isCollapsed && item.badge && (
-                    <Badge variant="amber" className="text-[10px] py-0 px-1.5">
-                      {item.badge}
-                    </Badge>
+          {/* Admin & Security Section - Only visible to authorized roles */}
+          {isExecutiveOrAdmin && (
+            <div className="pt-6">
+              {!isCollapsed && (
+                <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+                  <span>Executive & Admin</span>
+                  {user.role === 'ceo_founder' ? (
+                    <span className="text-[9px] text-amber-400 font-extrabold uppercase">👑 CEO Clearance</span>
+                  ) : (
+                    <span className="text-[9px] text-emerald-400 font-extrabold uppercase">🛡️ Mod Clearance</span>
                   )}
-                </Link>
-              );
-            })}
-          </div>
+                </div>
+              )}
+
+              {adminNav
+                .filter((item) => {
+                  if (item.href === '/admin/verification' && user.role !== 'ceo_founder') return false;
+                  return true;
+                })
+                .map((item) => {
+                  const Icon = item.icon;
+                  const active = pathname.startsWith(item.href);
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      title={isCollapsed ? item.label : undefined}
+                      className={`flex items-center justify-between rounded-lg text-sm font-medium transition-all ${
+                        isCollapsed ? 'justify-center p-2.5' : 'px-3 py-2.5'
+                      } ${
+                        active
+                          ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-semibold'
+                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3 min-w-0">
+                        <Icon className="w-5 h-5 shrink-0 text-amber-500" />
+                        {!isCollapsed && <span className="truncate">{item.label}</span>}
+                      </div>
+                      {!isCollapsed && item.badge && (
+                        <Badge variant="amber" className="text-[10px] py-0 px-1.5">
+                          {item.badge}
+                        </Badge>
+                      )}
+                    </Link>
+                  );
+                })}
+            </div>
+          )}
         </nav>
 
         {/* Sidebar Bottom Controls: Retract toggle when collapsed + User Profile */}
@@ -299,7 +329,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
           {isCollapsed && (
             <button
               onClick={toggleSidebar}
-              className="w-full flex items-center justify-center p-2 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              className="w-full flex items-center justify-center p-2 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               title="Expand Sidebar"
             >
               <PanelLeftOpen className="w-4 h-4" />
@@ -308,19 +338,23 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
           <Link
             href={`/profile/${user.username}`}
-            className={`flex items-center space-x-3 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors ${
-              isCollapsed ? 'justify-center' : ''
+            className={`flex items-center rounded-xl transition-all ${
+              isCollapsed ? 'justify-center p-1 hover:opacity-80' : 'p-2 hover:bg-slate-100 dark:hover:bg-slate-800/80 space-x-3'
             }`}
-            title={`${user.display_name} (@${user.username})`}
+            title={isCollapsed ? `${user.display_name} (@${user.username})` : undefined}
           >
             <Avatar name={user.display_name} src={user.avatar_url} size="sm" />
             {!isCollapsed && (
               <div className="flex-1 min-w-0">
                 <div className="flex items-center space-x-1">
-                  <p className="text-xs font-bold truncate text-slate-900 dark:text-slate-100">{user.display_name}</p>
-                  <Crown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <p className="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate">
+                    {user.display_name}
+                  </p>
+                  {user.role === 'ceo_founder' && <Crown className="w-3 h-3 text-amber-400 shrink-0" />}
                 </div>
-                <p className="text-[10px] text-slate-500 truncate">@{user.username} • CEO / Founder</p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                  @{user.username} • {user.role === 'ceo_founder' ? 'CEO / Founder' : user.role === 'moderator' ? 'Moderator' : 'Member'}
+                </p>
               </div>
             )}
           </Link>
@@ -352,10 +386,18 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
               <span>Ethiopian Accountability Platform</span>
               <span>•</span>
               <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Production Alpha</span>
-              <span className="text-amber-400 font-bold flex items-center space-x-1 bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-800">
-                <Crown className="w-3 h-3 text-amber-400" />
-                <span>CEO Authority</span>
-              </span>
+              {user.role === 'ceo_founder' && (
+                <span className="text-amber-400 font-bold flex items-center space-x-1 bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-800">
+                  <Crown className="w-3 h-3 text-amber-400" />
+                  <span>CEO Authority</span>
+                </span>
+              )}
+              {user.role === 'moderator' && (
+                <span className="text-emerald-400 font-bold flex items-center space-x-1 bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-800">
+                  <ShieldAlert className="w-3 h-3 text-emerald-400" />
+                  <span>Moderator</span>
+                </span>
+              )}
             </div>
           </div>
 

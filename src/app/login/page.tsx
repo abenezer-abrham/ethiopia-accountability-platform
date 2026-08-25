@@ -105,6 +105,9 @@ function LoginForm() {
   const handleQuickDemoLogin = async (role: 'ceo' | 'moderator' | 'user') => {
     setLoading(true);
     setError('');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('user_role', role === 'ceo' ? 'ceo_founder' : role === 'moderator' ? 'moderator' : 'user');
+    }
     try {
       const email = role === 'ceo'
         ? process.env.NEXT_PUBLIC_DEMO_CEO_EMAIL!

@@ -27,6 +27,9 @@ export default function SignUpPage() {
   const handleOAuthSignUp = async (provider: 'google' | 'github' | 'apple') => {
     setOauthLoading(provider);
     setError('');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('user_role', 'user');
+    }
 
     try {
       const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
@@ -51,6 +54,9 @@ export default function SignUpPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('user_role', 'user');
+    }
 
     if (!email) {
       setError('Please enter a valid email address.');

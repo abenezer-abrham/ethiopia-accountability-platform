@@ -69,8 +69,8 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(1);
 
   // Form State
-  const [displayName, setDisplayName] = useState('Abebe Kebede');
-  const [username, setUsername] = useState('abebe_k');
+  const [displayName, setDisplayName] = useState('');
+  const [username, setUsername] = useState('');
   const [usernameError, setUsernameError] = useState('');
   const [selectedSubCity, setSelectedSubCity] = useState<SubCity>('Bole');
   const [selectedCampus, setSelectedCampus] = useState<UniversityCampus>('AAU (Addis Ababa University)');
@@ -107,6 +107,9 @@ export default function OnboardingPage() {
   };
 
   const handleFinish = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('user_role', 'user');
+    }
     router.push('/home');
   };
 
