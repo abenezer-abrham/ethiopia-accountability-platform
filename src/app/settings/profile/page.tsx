@@ -6,20 +6,31 @@ import { User, Settings, Save, CheckCircle2, ArrowLeft, Upload, MapPin, Sparkles
 import { Button } from '@/components/ui/Button';
 import { Card, Badge, Avatar } from '@/components/ui/Card';
 import { Input, Textarea } from '@/components/ui/Input';
-import { INITIAL_PROFILES } from '@/lib/store';
+import { getCurrentUser, setCurrentUser } from '@/lib/user-session';
+import { Profile } from '@/lib/types';
 
 export default function SettingsProfilePage() {
-  const currentProfile = INITIAL_PROFILES[0];
+  const [profile, setProfile] = useState<Profile>(getCurrentUser);
 
-  const [displayName, setDisplayName] = useState(currentProfile.display_name);
-  const [bio, setBio] = useState(currentProfile.bio || '');
-  const [location, setLocation] = useState(currentProfile.location_region || 'Addis Ababa');
-  const [experience, setExperience] = useState(currentProfile.experience_summary || '');
-  const [avatarUrl, setAvatarUrl] = useState(currentProfile.avatar_url || '');
+  const [displayName, setDisplayName] = useState(profile.display_name);
+  const [bio, setBio] = useState(profile.bio || '');
+  const [location, setLocation] = useState(profile.location_region || 'Addis Ababa');
+  const [experience, setExperience] = useState(profile.experience_summary || '');
+  const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || '');
 
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   const handleSave = () => {
+    const updated: Profile = {
+      ...profile,
+      display_name: displayName,
+      bio,
+      location_region: location,
+      experience_summary: experience,
+      avatar_url: avatarUrl,
+    };
+    setCurrentUser(updated);
+    setProfile(updated);
     setSavedSuccess(true);
     setTimeout(() => {
       setSavedSuccess(false);
@@ -31,7 +42,7 @@ export default function SettingsProfilePage() {
       {/* Header */}
       <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center space-x-3">
-          <Link href={`/profile/${currentProfile.username}`}>
+          <Link href={`/profile/${profile.username}`}>
             <Button variant="ghost" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />}>
               Back to Profile
             </Button>
@@ -41,6 +52,11 @@ export default function SettingsProfilePage() {
             <span>Profile Settings</span>
           </h1>
         </div>
+        <Link href="/settings/verification">
+          <Button variant="outline" size="sm" leftIcon={<Sparkles className="w-4 h-4 text-emerald-500" />}>
+            Apply for Badge
+          </Button>
+        </Link>
       </div>
 
       {/* Main Settings Card */}
@@ -120,7 +136,7 @@ export default function SettingsProfilePage() {
 
         {/* Action Controls */}
         <div className="flex justify-end space-x-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-          <Link href={`/profile/${currentProfile.username}`}>
+          <Link href={`/profile/${profile.username}`}>
             <Button variant="outline">
               Cancel
             </Button>

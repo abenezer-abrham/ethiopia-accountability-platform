@@ -6,6 +6,7 @@ import { Key, ShieldCheck, CheckCircle2, AlertCircle, ArrowLeft, Lock } from 'lu
 import { Button } from '@/components/ui/Button';
 import { Card, Badge } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
+import { setUserRole } from '@/lib/user-session';
 
 export default function AdminClaimPage() {
   const [inviteCode, setInviteCode] = useState('');
@@ -22,8 +23,10 @@ export default function AdminClaimPage() {
     }
 
     if (code === 'ET-OWNER-2026-ADMIN' || code === 'ET-MOD-2026') {
+      const assigned = code.includes('ADMIN') ? 'admin' : 'moderator';
       setError('');
-      setRoleAssigned(code.includes('ADMIN') ? 'admin' : 'moderator');
+      setRoleAssigned(assigned);
+      setUserRole(assigned);
       setSuccess(true);
     } else {
       setError('Invalid or expired Admin Invitation Key. Please request a valid key from the platform owner.');

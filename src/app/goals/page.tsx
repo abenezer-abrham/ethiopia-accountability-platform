@@ -8,11 +8,19 @@ import { Card, Badge } from '@/components/ui/Card';
 import { Input, Textarea } from '@/components/ui/Input';
 import { Dialog } from '@/components/ui/Dialog';
 import { ProgressBar } from '@/components/ui/Progress';
-import { INITIAL_GOALS, INITIAL_ROUTINES, Goal } from '@/lib/store';
+import { Goal } from '@/lib/store';
+import { getStoredGoals, saveGoal, getCurrentUser } from '@/lib/user-session';
 
 export default function GoalsPage() {
-  const [goals, setGoals] = useState<Goal[]>(INITIAL_GOALS);
+  const [goals, setGoals] = useState<Goal[]>([]);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+  useEffect(() => {
+    setGoals(getStoredGoals());
+    const sync = () => setGoals(getStoredGoals());
+    window.addEventListener('storage', sync);
+    return () => window.removeEventListener('storage', sync);
+  }, []);
 
   // Form State for Multi-step creation
   const [newTitle, setNewTitle] = useState('');
@@ -26,10 +34,11 @@ export default function GoalsPage() {
 
   const handleCreateGoal = () => {
     if (!newTitle) return;
+    const user = getCurrentUser();
 
     const created: Goal = {
       id: `goal-${Date.now()}`,
-      user_id: 'usr-1',
+      user_id: user.id,
       title: newTitle,
       description: newDesc,
       category: newCategory,
@@ -43,7 +52,8 @@ export default function GoalsPage() {
       created_at: new Date().toISOString()
     };
 
-    setGoals([created, ...goals]);
+    saveGoal(created);
+    setGoals(getStoredGoals());
     setIsCreateOpen(false);
     setNewTitle('');
     setNewDesc('');

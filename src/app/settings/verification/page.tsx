@@ -15,6 +15,8 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Card, Badge } from '@/components/ui/Card';
 import { Input, Textarea } from '@/components/ui/Input';
+import { getCurrentUser, submitVerificationRequest } from '@/lib/user-session';
+import { VerificationRequest } from '@/lib/types';
 
 export default function VerificationRequestPage() {
   const [requestType, setRequestType] = useState<'individual_creator' | 'organization' | 'university_faculty'>('individual_creator');
@@ -25,6 +27,31 @@ export default function VerificationRequestPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const user = getCurrentUser();
+
+    const badgeRequested =
+      requestType === 'individual_creator'
+        ? 'verified_partner'
+        : requestType === 'organization'
+        ? 'verified_org'
+        : 'verified_admin';
+
+    const newRequest: VerificationRequest = {
+      id: `ver-${Date.now()}`,
+      user_id: user.id,
+      user_name: user.display_name,
+      username: user.username,
+      user_avatar: user.avatar_url,
+      type: requestType,
+      organization_name: orgName || undefined,
+      official_email: officialEmail,
+      badge_requested: badgeRequested,
+      reason,
+      status: 'pending',
+      submitted_at: 'Just now',
+    };
+
+    submitVerificationRequest(newRequest);
     setSubmitted(true);
   };
 

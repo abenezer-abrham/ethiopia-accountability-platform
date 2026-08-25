@@ -7,14 +7,25 @@ import { Card, Avatar, Badge } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { INITIAL_PROFILES, Profile } from '@/lib/store';
 import { inspectAndSanitizeContent } from '@/lib/link-guard';
+import { getCurrentUser } from '@/lib/user-session';
 
 export default function MessagesPage() {
-  const [selectedUser, setSelectedUser] = useState<Profile>(INITIAL_PROFILES[1]); // Meron Tadesse
+  const [currentUser, setCurrentUser] = useState<Profile>(getCurrentUser);
+
+  useEffect(() => {
+    setCurrentUser(getCurrentUser());
+    const sync = () => setCurrentUser(getCurrentUser());
+    window.addEventListener('storage', sync);
+    return () => window.removeEventListener('storage', sync);
+  }, []);
+
+  const partnerProfiles = INITIAL_PROFILES.filter((p) => p.id !== currentUser.id && p.username !== currentUser.username);
+  const [selectedUser, setSelectedUser] = useState<Profile>(partnerProfiles[0] || INITIAL_PROFILES[1]);
   const [messagesMap, setMessagesMap] = useState<Record<string, Array<{ id: string; sender: string; text: string; time: string }>>>({
     'usr-2': [
-      { id: 'm1', sender: 'usr-2', text: 'Selam Abebe! How is your Next.js accountability routine going today?', time: '10:15 AM' },
-      { id: 'm2', sender: 'usr-1', text: 'Selam Meron! Going great, completed the 1-hour practice session with full checkin proof.', time: '10:18 AM' },
-      { id: 'm3', sender: 'usr-2', text: 'Awesome! I just logged my Forex journal entry for today as well.', time: '10:20 AM' }
+      { id: 'm1', sender: 'usr-2', text: 'Selam! How is your habit routine going today?', time: '10:15 AM' },
+      { id: 'm2', sender: 'me', text: 'Selam Meron! Going great, completed my daily practice session with verified proof.', time: '10:18 AM' },
+      { id: 'm3', sender: 'usr-2', text: 'Awesome! I just logged my routine entry for today as well.', time: '10:20 AM' }
     ]
   });
 
@@ -39,7 +50,7 @@ export default function MessagesPage() {
 
     const newMessage = {
       id: `msg-${Date.now()}`,
-      sender: 'usr-1',
+      sender: currentUser.id,
       text: cleanText,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
@@ -73,7 +84,7 @@ export default function MessagesPage() {
             Partners & Squad Members
           </span>
 
-          {INITIAL_PROFILES.filter(p => p.id !== 'usr-1').map((user) => {
+          {partnerProfiles.map((user) => {
             const isSelected = selectedUser.id === user.id;
             return (
               <button
@@ -142,7 +153,7 @@ export default function MessagesPage() {
               </div>
             ) : (
               activeMessages.map((msg) => {
-                const isMe = msg.sender === 'usr-1';
+                const isMe = msg.sender === currentUser.id || msg.sender === 'me';
                 return (
                   <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                     <div

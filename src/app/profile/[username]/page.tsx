@@ -10,12 +10,25 @@ import { ProgressBar } from '@/components/ui/Progress';
 import { Dialog } from '@/components/ui/Dialog';
 import { Input, Textarea } from '@/components/ui/Input';
 import { INITIAL_PROFILES, INITIAL_GOALS, Profile } from '@/lib/store';
+import { getCurrentUser, setCurrentUser } from '@/lib/user-session';
 
 export default function ProfilePage() {
   const params = useParams();
   const username = params.username as string;
 
-  const initialProfile = INITIAL_PROFILES.find(p => p.username === username) || INITIAL_PROFILES[0];
+  const [currentUser, setCurrentUserSession] = useState<Profile>(getCurrentUser);
+
+  useEffect(() => {
+    setCurrentUserSession(getCurrentUser());
+    const sync = () => setCurrentUserSession(getCurrentUser());
+    window.addEventListener('storage', sync);
+    return () => window.removeEventListener('storage', sync);
+  }, []);
+
+  const initialProfile =
+    username === currentUser.username
+      ? currentUser
+      : INITIAL_PROFILES.find((p) => p.username === username) || INITIAL_PROFILES[0];
 
   const [profile, setProfile] = useState<Profile>(initialProfile);
   const [following, setFollowing] = useState(false);
@@ -27,16 +40,22 @@ export default function ProfilePage() {
   const [editLocation, setEditLocation] = useState(profile.location_region || 'Addis Ababa');
   const [editAvatar, setEditAvatar] = useState(profile.avatar_url || '');
 
-  const publicGoals = INITIAL_GOALS.filter(g => g.user_id === profile.id);
+  const publicGoals = INITIAL_GOALS.filter((g) => g.user_id === profile.id);
+
+  const isOwner = currentUser.username === profile.username || currentUser.id === profile.id;
 
   const handleSaveProfile = () => {
-    setProfile({
+    const updated = {
       ...profile,
       display_name: editDisplayName,
       bio: editBio,
       location_region: editLocation,
-      avatar_url: editAvatar
-    });
+      avatar_url: editAvatar,
+    };
+    setProfile(updated);
+    if (isOwner) {
+      setCurrentUser(updated);
+    }
     setEditModalOpen(false);
   };
 
@@ -58,7 +77,7 @@ export default function ProfilePage() {
           </div>
 
           <div className="flex items-center space-x-3 w-full sm:w-auto">
-            {profile.id !== 'usr-1' ? (
+            {!isOwner ? (
               <>
                 <Button
                   variant={following ? 'outline' : 'primary'}

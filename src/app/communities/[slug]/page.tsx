@@ -9,6 +9,7 @@ import { Card, Badge, Avatar } from '@/components/ui/Card';
 import { Input, Textarea } from '@/components/ui/Input';
 import { Dialog } from '@/components/ui/Dialog';
 import { INITIAL_COMMUNITIES, INITIAL_POSTS, INITIAL_CHALLENGES, INITIAL_PROFILES, Post } from '@/lib/store';
+import { getCurrentUser } from '@/lib/user-session';
 
 export default function CommunityDetailPage() {
   const params = useParams();
@@ -41,12 +42,13 @@ export default function CommunityDetailPage() {
 
   const handleCreatePost = () => {
     if (!postTitle || !postBody) return;
+    const user = getCurrentUser();
 
     const newPost: Post = {
       id: `post-${Date.now()}`,
       community_id: community.id,
-      author_id: 'usr-1',
-      author: INITIAL_PROFILES[0],
+      author_id: user.id,
+      author: user,
       title: postTitle,
       body: postBody,
       media_url: postMedia || undefined,

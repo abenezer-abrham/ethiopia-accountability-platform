@@ -36,16 +36,28 @@ import { ImagePrivacyEditor } from '@/components/ui/ImagePrivacyEditor';
 import { ProofAuditSection } from '@/components/ProofAuditSection';
 import { DICTIONARY, AppLanguage, getStoredLanguage } from '@/lib/i18n';
 import confetti from 'canvas-confetti';
+import { getCurrentUser, getStoredCheckins, saveCheckin } from '@/lib/user-session';
+import { Profile } from '@/lib/types';
 
 export default function HomePage() {
   const [currentLang, setCurrentLang] = useState<AppLanguage>('en');
   const t = DICTIONARY[currentLang] || DICTIONARY.en;
+  const [currentUser, setCurrentUser] = useState<Profile>(getCurrentUser);
 
   useEffect(() => {
     setCurrentLang(getStoredLanguage());
+    setCurrentUser(getCurrentUser());
+    setCheckins(getStoredCheckins());
+
+    const sync = () => {
+      setCurrentUser(getCurrentUser());
+      setCheckins(getStoredCheckins());
+    };
+    window.addEventListener('storage', sync);
+    return () => window.removeEventListener('storage', sync);
   }, []);
 
-  const [checkins, setCheckins] = useState<GoalCheckin[]>(INITIAL_CHECKINS);
+  const [checkins, setCheckins] = useState<GoalCheckin[]>([]);
   const [selectedRoutine, setSelectedRoutine] = useState<{ goalId: string; routineId: string; title: string; category?: string } | null>(null);
   const [checkinNote, setCheckinNote] = useState('');
   
@@ -115,7 +127,7 @@ export default function HomePage() {
       id: `chk-${Date.now()}`,
       goal_id: selectedRoutine.goalId,
       routine_id: selectedRoutine.routineId,
-      user_id: 'usr-1',
+      user_id: currentUser.id,
       scheduled_date: todayStr,
       completed_at: new Date().toISOString(),
       status: 'completed',
@@ -126,6 +138,9 @@ export default function HomePage() {
       privacy_blurred: isFaceBlurred,
       squad_id: shareAudience === 'squad' ? targetSquadId : undefined,
     };
+
+    // Save to persistent storage
+    saveCheckin(newCheckin);
 
     // If offline or data saver, enqueue to IndexedDB
     if (!navigator.onLine) {
@@ -142,7 +157,7 @@ export default function HomePage() {
       });
     }
 
-    setCheckins([newCheckin, ...checkins]);
+    setCheckins(getStoredCheckins());
     setSelectedRoutine(null);
 
     // Trigger celebration micro-animation
@@ -160,11 +175,11 @@ export default function HomePage() {
         <div>
           <div className="flex items-center space-x-2">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-              {t.home.greeting}
+              {t.home.greeting}, {currentUser.display_name.split(' ')[0]}!
             </h1>
             <Badge variant="emerald">{t.home.habitLevel}</Badge>
             <span className="text-xs bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-bold px-2 py-0.5 rounded-full border border-amber-800/40">
-              Bole Sub-City
+              {currentUser.sub_city || 'Addis Ababa'}
             </span>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">

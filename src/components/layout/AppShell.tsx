@@ -21,14 +21,15 @@ import {
   Key,
   Inbox,
   Crown,
+  LogOut,
   Menu
 } from 'lucide-react';
 import { Avatar, Badge } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { INITIAL_PROFILES } from '@/lib/store';
 import { processOfflineQueue, subscribeQueueChanges, QueuedCheckin } from '@/lib/offline-queue';
 import { DICTIONARY, AppLanguage, getStoredLanguage, setStoredLanguage } from '@/lib/i18n';
 import { OfflineQueueModal } from '../ui/OfflineQueueModal';
+import { getCurrentUser, logoutUser } from '@/lib/user-session';
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const pathname = usePathname();
@@ -59,20 +60,11 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
   const t = DICTIONARY[currentLang] || DICTIONARY.en;
 
   // Current logged in user state (dynamically resolves role or defaults to standard user)
-  const [user, setUser] = useState<Profile>(INITIAL_PROFILES[2]); // Default: Samuel Alemu (role: user)
+  const [user, setUser] = useState<Profile>(getCurrentUser);
 
   useEffect(() => {
     const syncUser = () => {
-      if (typeof window !== 'undefined') {
-        const storedRole = localStorage.getItem('user_role');
-        if (storedRole === 'ceo_founder') {
-          setUser(INITIAL_PROFILES[0]);
-        } else if (storedRole === 'moderator') {
-          setUser(INITIAL_PROFILES[1]);
-        } else {
-          setUser(INITIAL_PROFILES[2]);
-        }
-      }
+      setUser(getCurrentUser());
     };
     syncUser();
     window.addEventListener('storage', syncUser);
@@ -336,28 +328,44 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             </button>
           )}
 
-          <Link
-            href={`/profile/${user.username}`}
-            className={`flex items-center rounded-xl transition-all ${
-              isCollapsed ? 'justify-center p-1 hover:opacity-80' : 'p-2 hover:bg-slate-100 dark:hover:bg-slate-800/80 space-x-3'
-            }`}
-            title={isCollapsed ? `${user.display_name} (@${user.username})` : undefined}
-          >
-            <Avatar name={user.display_name} src={user.avatar_url} size="sm" />
-            {!isCollapsed && (
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center space-x-1">
-                  <p className="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate">
-                    {user.display_name}
+          <div className="flex items-center justify-between">
+            <Link
+              href={`/profile/${user.username}`}
+              className={`flex items-center rounded-xl transition-all flex-1 min-w-0 ${
+                isCollapsed ? 'justify-center p-1 hover:opacity-80' : 'p-2 hover:bg-slate-100 dark:hover:bg-slate-800/80 space-x-3'
+              }`}
+              title={isCollapsed ? `${user.display_name} (@${user.username})` : undefined}
+            >
+              <Avatar name={user.display_name} src={user.avatar_url} size="sm" />
+              {!isCollapsed && (
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center space-x-1">
+                    <p className="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate">
+                      {user.display_name}
+                    </p>
+                    {user.role === 'ceo_founder' && <Crown className="w-3 h-3 text-amber-400 shrink-0" />}
+                  </div>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                    @{user.username} • {user.role === 'ceo_founder' ? 'CEO / Founder' : user.role === 'moderator' ? 'Moderator' : 'Member'}
                   </p>
-                  {user.role === 'ceo_founder' && <Crown className="w-3 h-3 text-amber-400 shrink-0" />}
                 </div>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
-                  @{user.username} • {user.role === 'ceo_founder' ? 'CEO / Founder' : user.role === 'moderator' ? 'Moderator' : 'Member'}
-                </p>
-              </div>
+              )}
+            </Link>
+
+            {!isCollapsed && (
+              <button
+                type="button"
+                onClick={() => {
+                  logoutUser();
+                  window.location.href = '/login';
+                }}
+                className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors cursor-pointer shrink-0"
+                title="Sign Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
             )}
-          </Link>
+          </div>
         </div>
       </aside>
 

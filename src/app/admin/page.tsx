@@ -20,6 +20,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Card, Badge } from '@/components/ui/Card';
 import { INITIAL_REPORTS, INITIAL_VERIFICATION_REQUESTS, Report } from '@/lib/store';
+import { AdminRouteGuard } from '@/components/AdminRouteGuard';
 
 export default function AdminPage() {
   const [reports, setReports] = useState<Report[]>(INITIAL_REPORTS);
@@ -40,7 +41,8 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <AdminRouteGuard requiredRole="admin_or_mod">
+      <div className="space-y-6">
       <div className="pb-2 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 flex items-center space-x-2">
@@ -162,6 +164,7 @@ export default function AdminPage() {
           ))}
         </div>
       </Card>
-    </div>
+      </div>
+    </AdminRouteGuard>
   );
 }

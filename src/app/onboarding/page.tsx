@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, Badge, Avatar } from '@/components/ui/Card';
 import { INITIAL_COMMUNITIES, SubCity, UniversityCampus, ActiveWindow } from '@/lib/store';
+import { setCurrentUser } from '@/lib/user-session';
 
 const SUB_CITIES: SubCity[] = [
   'Bole',
@@ -107,9 +108,28 @@ export default function OnboardingPage() {
   };
 
   const handleFinish = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('user_role', 'user');
-    }
+    const finalDisplayName = displayName.trim() || 'New Member';
+    const finalUsername = username.trim().toLowerCase() || `user_${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const newProfile = {
+      id: `usr-${Date.now()}`,
+      username: finalUsername,
+      display_name: finalDisplayName,
+      bio: `Practicing ${selectedInterests.join(', ')} in ${selectedSubCity}.`,
+      avatar_url: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(finalDisplayName)}`,
+      location_region: 'Addis Ababa',
+      sub_city: selectedSubCity,
+      university_campus: selectedCampus,
+      active_window: selectedSchedule,
+      trust_tier: 'tier_1_verified' as const,
+      verification_badge: 'none' as const,
+      experience_summary: `${selectedInterests[0] || 'Learning'} Practitioner`,
+      role: 'user' as const,
+      reputation_score: 50,
+      created_at: new Date().toISOString(),
+    };
+
+    setCurrentUser(newProfile);
     router.push('/home');
   };
 
