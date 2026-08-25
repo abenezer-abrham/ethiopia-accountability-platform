@@ -86,7 +86,7 @@ export const INITIAL_VERIFICATION_REQUESTS: VerificationRequest[] = [
     badge_requested: 'verified_partner',
     submitted_at: '2 days ago',
     reviewed_at: '1 day ago',
-    reviewed_by: 'Abebe Kebede (CEO)'
+    reviewed_by: 'Abenezer Abrham (CEO)'
   },
   {
     id: 'vr-2',
@@ -195,7 +195,7 @@ export const INITIAL_SQUADS: Squad[] = [
     university_campus: 'AAU (Addis Ababa University)',
     active_window: 'Night Owl (10 PM – 1 AM)',
     leader_id: 'usr-1',
-    leader_name: 'Abebe Kebede',
+    leader_name: 'Abenezer Abrham',
     leader_avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
     total_squad_streak: 42,
     is_private: false,

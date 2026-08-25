@@ -103,7 +103,7 @@ export const DICTIONARY: Record<AppLanguage, Translations> = {
       settings: 'Settings',
     },
     home: {
-      greeting: 'Selam, Abebe 🇪🇹',
+      greeting: 'Selam',
       habitLevel: 'Habit Level 4',
       todaySummary: 'Here is your accountability command center for today',
       newGoal: 'New Goal',
@@ -179,7 +179,7 @@ export const DICTIONARY: Record<AppLanguage, Translations> = {
       settings: 'ቅንብሮች',
     },
     home: {
-      greeting: 'ሰላም፣ አበበ 🇪🇹',
+      greeting: 'ሰላም',
       habitLevel: 'የልማድ ደረጃ 4',
       todaySummary: 'የዛሬው የዕለታዊ ተጠያቂነት እና የልማድ ክትትል ማዕከልዎ',
       newGoal: 'አዲስ ግብ',
@@ -255,7 +255,7 @@ export const DICTIONARY: Record<AppLanguage, Translations> = {
       settings: 'Qindaa’inoota',
     },
     home: {
-      greeting: 'Akkam, Abebe 🇪🇹',
+      greeting: 'Akkam',
       habitLevel: 'Sadarkaa 4',
       todaySummary: 'Giddu-gala itti-gaafatamummaa fi amala guyyaa kee',
       newGoal: 'Galma Haaraa',

@@ -75,10 +75,11 @@ export default function CommunityDetailPage() {
 
   const handleAddComment = (postId: string) => {
     if (!commentText) return;
+    const user = getCurrentUser();
     const list = commentsMap[postId] || [];
     setCommentsMap({
       ...commentsMap,
-      [postId]: [...list, { author: 'Abebe Kebede', text: commentText, date: 'Just now' }]
+      [postId]: [...list, { author: user.display_name, text: commentText, date: 'Just now' }]
     });
     setCommentText('');
   };
