@@ -1,4 +1,7 @@
-import { Profile, INITIAL_PROFILES, UserRole, Goal, INITIAL_GOALS, GoalCheckin, INITIAL_CHECKINS, VerificationRequest, INITIAL_VERIFICATION_REQUESTS } from './store';
+import { Profile, INITIAL_PROFILES, UserRole, Goal, INITIAL_GOALS, GoalCheckin, INITIAL_CHECKINS, VerificationRequest, INITIAL_VERIFICATION_REQUESTS, AdminRecord } from './store';
+
+export type { AdminRecord };
+export const ROOT_ADMIN_EMAIL = 'abenezerabrham61@gmail.com';
 
 const STORAGE_KEYS = {
   USER: 'egna_current_user',
@@ -6,10 +9,207 @@ const STORAGE_KEYS = {
   GOALS: 'egna_user_goals',
   CHECKINS: 'egna_user_checkins',
   VERIFICATIONS: 'egna_verifications_queue',
+  ADMIN_REGISTRY: 'egna_admin_registry',
+  VERIFIED_EMAILS: 'egna_verified_emails',
 };
 
-// Default standard member (Samuel Alemu)
+// Initial system admin registry with Abenezer Abrham as the sole Root CEO & Admin
+export const INITIAL_ADMIN_REGISTRY: AdminRecord[] = [
+  {
+    email: ROOT_ADMIN_EMAIL,
+    role: 'ceo_founder',
+    name: 'Abenezer Abrham',
+    added_by: 'system_root',
+    added_at: '2026-08-01',
+    is_root: true,
+  },
+  {
+    email: 'meron.tadesse@egna.et',
+    role: 'moderator',
+    name: 'Meron Tadesse',
+    added_by: ROOT_ADMIN_EMAIL,
+    added_at: '2026-08-10',
+    is_root: false,
+  }
+];
+
+// Default standard member
 export const DEFAULT_MEMBER: Profile = INITIAL_PROFILES[2];
+
+/**
+ * Get all registered administrators from persistent storage
+ */
+export function getAdminRegistry(): AdminRecord[] {
+  if (typeof window === 'undefined') return INITIAL_ADMIN_REGISTRY;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.ADMIN_REGISTRY);
+    if (raw) {
+      const parsed: AdminRecord[] = JSON.parse(raw);
+      // Ensure root admin is always present and never removed
+      if (!parsed.some(a => a.email.toLowerCase() === ROOT_ADMIN_EMAIL.toLowerCase())) {
+        parsed.unshift(INITIAL_ADMIN_REGISTRY[0]);
+      }
+      return parsed;
+    }
+  } catch (err) {
+    console.warn('Error reading admin registry:', err);
+  }
+  return INITIAL_ADMIN_REGISTRY;
+}
+
+/**
+ * Check if an email is registered as an admin or moderator
+ */
+export function isEmailAdmin(email: string): AdminRecord | null {
+  if (!email) return null;
+  const normalized = email.trim().toLowerCase();
+  const registry = getAdminRegistry();
+  return registry.find(a => a.email.toLowerCase() === normalized) || null;
+}
+
+/**
+ * Add or invite a new admin/moderator to the database registry
+ */
+export function addAdminEmail(email: string, role: UserRole, name: string, addedBy: string = ROOT_ADMIN_EMAIL): boolean {
+  if (typeof window === 'undefined' || !email) return false;
+  try {
+    const registry = getAdminRegistry();
+    const normalized = email.trim().toLowerCase();
+    const updated = [
+      ...registry.filter(a => a.email.toLowerCase() !== normalized),
+      {
+        email: normalized,
+        role,
+        name: name.trim() || 'Administrator',
+        added_by: addedBy,
+        added_at: new Date().toISOString().split('T')[0],
+        is_root: normalized === ROOT_ADMIN_EMAIL.toLowerCase(),
+      }
+    ];
+    localStorage.setItem(STORAGE_KEYS.ADMIN_REGISTRY, JSON.stringify(updated));
+    window.dispatchEvent(new Event('storage'));
+    return true;
+  } catch (err) {
+    console.error('Failed to add admin record:', err);
+    return false;
+  }
+}
+
+/**
+ * Remove an admin (root admin cannot be removed)
+ */
+export function removeAdminEmail(email: string): boolean {
+  if (typeof window === 'undefined' || !email) return false;
+  const normalized = email.trim().toLowerCase();
+  if (normalized === ROOT_ADMIN_EMAIL.toLowerCase()) {
+    console.warn('Cannot remove root CEO admin');
+    return false;
+  }
+  try {
+    const registry = getAdminRegistry();
+    const updated = registry.filter(a => a.email.toLowerCase() !== normalized);
+    localStorage.setItem(STORAGE_KEYS.ADMIN_REGISTRY, JSON.stringify(updated));
+    window.dispatchEvent(new Event('storage'));
+    return true;
+  } catch (err) {
+    console.error('Failed to remove admin record:', err);
+    return false;
+  }
+}
+
+/**
+ * Authenticate session via email cross-reference
+ */
+export function loginWithEmailCrossReference(email: string, customName?: string): Profile {
+  const normalized = email.trim().toLowerCase();
+  const adminRecord = isEmailAdmin(normalized);
+
+  if (normalized === ROOT_ADMIN_EMAIL.toLowerCase() || adminRecord?.role === 'ceo_founder') {
+    const ceoProfile = INITIAL_PROFILES[0];
+    setCurrentUser(ceoProfile);
+    return ceoProfile;
+  }
+
+  if (adminRecord) {
+    const adminProfile: Profile = {
+      id: `admin-${Date.now()}`,
+      username: normalized.split('@')[0],
+      display_name: adminRecord.name || customName || 'Platform Administrator',
+      email: normalized,
+      email_verified: true,
+      bio: `${adminRecord.role === 'moderator' ? 'Community Moderator' : 'System Admin'} at Egna.`,
+      avatar_url: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(adminRecord.name)}`,
+      location_region: 'Addis Ababa',
+      trust_tier: 'tier_3_leader',
+      verification_badge: adminRecord.role === 'moderator' ? 'verified_admin' : 'verified_admin',
+      role: adminRecord.role,
+      reputation_score: 1000,
+      created_at: new Date().toISOString(),
+    };
+    setCurrentUser(adminProfile);
+    return adminProfile;
+  }
+
+  // Standard user session
+  const userProfile: Profile = {
+    id: `usr-${Date.now()}`,
+    username: normalized.split('@')[0],
+    display_name: customName || normalized.split('@')[0],
+    email: normalized,
+    email_verified: isEmailVerified(normalized),
+    bio: 'Member practicing accountability on Egna.',
+    avatar_url: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(normalized)}`,
+    location_region: 'Addis Ababa',
+    trust_tier: 'tier_1_new',
+    verification_badge: 'none',
+    role: 'user',
+    reputation_score: 50,
+    created_at: new Date().toISOString(),
+  };
+  setCurrentUser(userProfile);
+  return userProfile;
+}
+
+/**
+ * Check if an email is marked as verified
+ */
+export function isEmailVerified(email: string): boolean {
+  if (!email) return false;
+  if (email.trim().toLowerCase() === ROOT_ADMIN_EMAIL.toLowerCase()) return true;
+  if (typeof window === 'undefined') return false;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.VERIFIED_EMAILS);
+    if (raw) {
+      const list: string[] = JSON.parse(raw);
+      return list.includes(email.trim().toLowerCase());
+    }
+  } catch (err) {
+    console.warn('Error reading verified emails:', err);
+  }
+  return false;
+}
+
+/**
+ * Mark email as verified
+ */
+export function markEmailVerified(email: string): void {
+  if (typeof window === 'undefined' || !email) return;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.VERIFIED_EMAILS);
+    const list: string[] = raw ? JSON.parse(raw) : [];
+    const normalized = email.trim().toLowerCase();
+    if (!list.includes(normalized)) {
+      list.push(normalized);
+      localStorage.setItem(STORAGE_KEYS.VERIFIED_EMAILS, JSON.stringify(list));
+    }
+    const current = getCurrentUser();
+    if (current.email?.toLowerCase() === normalized) {
+      setCurrentUser({ ...current, email_verified: true });
+    }
+  } catch (err) {
+    console.error('Failed to mark email verified:', err);
+  }
+}
 
 /**
  * Resolves the currently authenticated user profile

@@ -6,6 +6,24 @@ export type TrustTier = 'tier_1_new' | 'tier_2_verified' | 'tier_3_leader';
 
 export type VerificationBadge = 'none' | 'ceo_founder' | 'verified_admin' | 'verified_org' | 'verified_partner';
 
+export type EthiopianRegion =
+  | 'Addis Ababa'
+  | 'Dire Dawa'
+  | 'Oromia'
+  | 'Amhara'
+  | 'Tigray'
+  | 'Sidama'
+  | 'Central Ethiopia'
+  | 'South Ethiopia'
+  | 'Southwest Ethiopia'
+  | 'Somali'
+  | 'Benishangul-Gumuz'
+  | 'Gambella'
+  | 'Harari'
+  | 'Afar'
+  | 'Diaspora / International'
+  | string;
+
 export type SubCity =
   | 'Bole'
   | 'Kirkos'
@@ -16,24 +34,54 @@ export type SubCity =
   | 'Nifas Silk-Lafto'
   | 'Kolfe Keranio'
   | 'Akaky Kaliti'
-  | 'Lemi Kura';
+  | 'Lemi Kura'
+  | 'Addis Ketema'
+  | string;
 
 export type UniversityCampus =
   | 'AAU (Addis Ababa University)'
   | 'ASTU (Adama Science & Tech)'
+  | 'AASTU (Addis Ababa Science & Tech)'
   | 'Jimma University'
   | 'Hawassa University'
   | 'Bahir Dar University'
-  | 'Dire Dawa University'
+  | 'University of Gondar'
   | 'Mekelle University'
-  | 'Haramaya University';
+  | 'Haramaya University'
+  | 'Dire Dawa University'
+  | 'Arba Minch University'
+  | 'Wollo University'
+  | 'Debre Berhan University'
+  | 'Debre Markos University'
+  | 'Wolaita Sodo University'
+  | 'Dilla University'
+  | 'Jigjiga University'
+  | 'Semera University'
+  | 'Assosa University'
+  | 'Gambella University'
+  | 'Unity University / Private College'
+  | 'ALX / Tech Bootcamp / Self-Taught'
+  | 'Working Professional / Industry'
+  | 'High School / Secondary Student'
+  | 'Independent / Other'
+  | string;
 
 export type ActiveWindow =
   | 'Early Bird (5 AM – 8 AM)'
   | 'Morning Focus (8 AM – 12 PM)'
   | 'Afternoon Sprint (1 PM – 5 PM)'
   | 'Evening Wind-down (6 PM – 9 PM)'
-  | 'Night Owl (10 PM – 1 AM)';
+  | 'Night Owl (10 PM – 1 AM)'
+  | string;
+
+export interface AdminRecord {
+  email: string;
+  role: UserRole;
+  name: string;
+  added_by: string;
+  added_at: string;
+  is_root?: boolean;
+}
 
 export interface VerificationRequest {
   id: string;
@@ -57,9 +105,11 @@ export interface Profile {
   id: string;
   username: string;
   display_name: string;
+  email?: string;
+  email_verified?: boolean;
   bio: string;
   avatar_url: string;
-  location_region?: string;
+  location_region?: EthiopianRegion;
   sub_city?: SubCity;
   university_campus?: UniversityCampus;
   active_window?: ActiveWindow;

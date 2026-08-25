@@ -24,7 +24,26 @@ import { Card, Badge, Avatar } from '@/components/ui/Card';
 import { INITIAL_COMMUNITIES, SubCity, UniversityCampus, ActiveWindow } from '@/lib/store';
 import { setCurrentUser } from '@/lib/user-session';
 
-const SUB_CITIES: SubCity[] = [
+const ETHIOPIAN_REGIONS = [
+  'Addis Ababa',
+  'Dire Dawa',
+  'Oromia (Adama, Bishoftu, Jimma, Shashemene...)',
+  'Amhara (Bahir Dar, Gondar, Dessie, Debre Berhan...)',
+  'Tigray (Mekelle, Shire, Aksum...)',
+  'Sidama (Hawassa, Yirgalem...)',
+  'Central Ethiopia (Hossana, Butajira, Welkite...)',
+  'South Ethiopia (Arba Minch, Wolaita Sodo, Dilla...)',
+  'Southwest Ethiopia (Bonga, Mizan Teferi...)',
+  'Somali (Jijiga, Gode...)',
+  'Benishangul-Gumuz (Assosa...)',
+  'Gambella',
+  'Harari (Harar)',
+  'Afar (Semera, Awash...)',
+  'Diaspora / International',
+  'Other / Custom City'
+];
+
+const ADDIS_SUBCITIES = [
   'Bole',
   'Kirkos',
   'Yeka',
@@ -35,15 +54,35 @@ const SUB_CITIES: SubCity[] = [
   'Kolfe Keranio',
   'Akaky Kaliti',
   'Lemi Kura',
+  'Addis Ketema',
 ];
 
-const CAMPUSES: UniversityCampus[] = [
-  'AAU (Addis Ababa University)',
-  'ASTU (Adama Science & Tech)',
-  'Jimma University',
-  'Hawassa University',
-  'Bahir Dar University',
+const ALL_CAMPUSES_AND_AFFILIATIONS = [
+  'Addis Ababa University (AAU)',
+  'Adama Science & Technology University (ASTU)',
+  'Addis Ababa Science & Technology University (AASTU)',
+  'Jimma University (JU)',
+  'Hawassa University (HU)',
+  'Bahir Dar University (BDU)',
+  'University of Gondar (UoG)',
+  'Mekelle University (MU)',
+  'Haramaya University',
   'Dire Dawa University',
+  'Arba Minch University',
+  'Wollo University / Dessie',
+  'Debre Berhan University',
+  'Debre Markos University',
+  'Wolaita Sodo University',
+  'Dilla University',
+  'Jigjiga University',
+  'Semera University',
+  'Assosa University',
+  'Gambella University',
+  'Unity University / Private College',
+  'ALX / Tech Bootcamp / Self-Taught',
+  'Working Professional / Industry',
+  'High School / Secondary Student',
+  'Independent / Other',
 ];
 
 const ACTIVE_WINDOWS: ActiveWindow[] = [
@@ -73,8 +112,12 @@ export default function OnboardingPage() {
   const [displayName, setDisplayName] = useState('');
   const [username, setUsername] = useState('');
   const [usernameError, setUsernameError] = useState('');
-  const [selectedSubCity, setSelectedSubCity] = useState<SubCity>('Bole');
-  const [selectedCampus, setSelectedCampus] = useState<UniversityCampus>('AAU (Addis Ababa University)');
+  const [emailInput, setEmailInput] = useState('');
+  const [selectedRegion, setSelectedRegion] = useState('Addis Ababa');
+  const [selectedSubCity, setSelectedSubCity] = useState<string>('Bole');
+  const [customLocation, setCustomLocation] = useState('');
+  const [selectedCampus, setSelectedCampus] = useState<string>('Addis Ababa University (AAU)');
+  const [customCampus, setCustomCampus] = useState('');
   const [selectedSchedule, setSelectedSchedule] = useState<ActiveWindow>('Early Bird (5 AM – 8 AM)');
 
   const [selectedInterests, setSelectedInterests] = useState<string[]>(['Programming', 'Fitness & Calisthenics']);
@@ -110,16 +153,25 @@ export default function OnboardingPage() {
   const handleFinish = () => {
     const finalDisplayName = displayName.trim() || 'New Member';
     const finalUsername = username.trim().toLowerCase() || `user_${Math.floor(1000 + Math.random() * 9000)}`;
+    const finalLocation = selectedRegion === 'Other / Custom City' && customLocation
+      ? customLocation
+      : selectedRegion;
+    const finalSubCity = selectedRegion === 'Addis Ababa' ? selectedSubCity : (customLocation || selectedRegion);
+    const finalCampus = selectedCampus === 'Independent / Other' && customCampus
+      ? customCampus
+      : selectedCampus;
 
     const newProfile = {
       id: `usr-${Date.now()}`,
       username: finalUsername,
       display_name: finalDisplayName,
-      bio: `Practicing ${selectedInterests.join(', ')} in ${selectedSubCity}.`,
+      email: emailInput || undefined,
+      email_verified: false,
+      bio: `Practicing ${selectedInterests.join(', ')} in ${finalLocation}.`,
       avatar_url: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(finalDisplayName)}`,
-      location_region: 'Addis Ababa',
-      sub_city: selectedSubCity,
-      university_campus: selectedCampus,
+      location_region: finalLocation,
+      sub_city: finalSubCity,
+      university_campus: finalCampus,
       active_window: selectedSchedule,
       trust_tier: 'tier_1_new' as const,
       verification_badge: 'none' as const,
@@ -141,7 +193,7 @@ export default function OnboardingPage() {
           🇪🇹
         </div>
         <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">Welcome to Egna (እኛ)</h1>
-        <p className="text-xs sm:text-sm text-slate-400">Step {step} of 5 — Localized Profile Setup</p>
+        <p className="text-xs sm:text-sm text-slate-400">Step {step} of 5 — Nationwide Profile Setup</p>
 
         {/* Progress Bar */}
         <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-3">
@@ -176,50 +228,90 @@ export default function OnboardingPage() {
               error={usernameError}
               placeholder="e.g. abebe_k"
             />
+
+            <Input
+              label="Email Address (For Verification & Notifications)"
+              type="email"
+              value={emailInput}
+              onChange={(e) => setEmailInput(e.target.value)}
+              placeholder="e.g. yourname@gmail.com"
+            />
           </div>
         )}
 
-        {/* Step 2: Localized Sub-City & Schedule Matching */}
+        {/* Step 2: Nationwide Location & Schedule Matching */}
         {step === 2 && (
           <div className="space-y-4 animate-fade-in">
             <div className="space-y-1">
               <h2 className="text-lg font-bold text-slate-100 flex items-center space-x-2">
                 <MapPin className="w-5 h-5 text-emerald-500" />
-                <span>Location & Schedule Matching</span>
+                <span>Nationwide Region & Schedule Matching</span>
               </h2>
               <p className="text-xs text-slate-400">
-                Match with 5-person accountability micro-squads in your sub-city or campus active at your schedule.
+                Match with 5-person accountability micro-squads across all Ethiopian regions, campuses, and active time windows.
               </p>
             </div>
 
             <div className="space-y-3">
+              {/* Region Selector */}
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
-                  Addis Ababa Sub-City / Base
+                  Region / City / Base
                 </label>
                 <select
-                  value={selectedSubCity}
-                  onChange={(e) => setSelectedSubCity(e.target.value as SubCity)}
+                  value={selectedRegion}
+                  onChange={(e) => setSelectedRegion(e.target.value)}
                   className="w-full rounded-lg border bg-slate-950 text-slate-100 p-2.5 text-xs border-slate-800"
                 >
-                  {SUB_CITIES.map((sub) => (
-                    <option key={sub} value={sub}>
-                      {sub}
+                  {ETHIOPIAN_REGIONS.map((reg) => (
+                    <option key={reg} value={reg}>
+                      {reg}
                     </option>
                   ))}
                 </select>
               </div>
 
+              {/* Sub-city if Addis Ababa */}
+              {selectedRegion === 'Addis Ababa' && (
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
+                    Addis Ababa Sub-City
+                  </label>
+                  <select
+                    value={selectedSubCity}
+                    onChange={(e) => setSelectedSubCity(e.target.value)}
+                    className="w-full rounded-lg border bg-slate-950 text-slate-100 p-2.5 text-xs border-slate-800"
+                  >
+                    {ADDIS_SUBCITIES.map((sub) => (
+                      <option key={sub} value={sub}>
+                        {sub}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Custom Location if other */}
+              {selectedRegion === 'Other / Custom City' && (
+                <Input
+                  label="Specify Your City or Town"
+                  placeholder="e.g. Debre Zeit / Bishoftu, Ambo, etc."
+                  value={customLocation}
+                  onChange={(e) => setCustomLocation(e.target.value)}
+                />
+              )}
+
+              {/* University / Academic / Professional Affiliation */}
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
-                  University / Institute (Optional)
+                  University / Academic / Professional Base (Optional)
                 </label>
                 <select
                   value={selectedCampus}
-                  onChange={(e) => setSelectedCampus(e.target.value as UniversityCampus)}
+                  onChange={(e) => setSelectedCampus(e.target.value)}
                   className="w-full rounded-lg border bg-slate-950 text-slate-100 p-2.5 text-xs border-slate-800"
                 >
-                  {CAMPUSES.map((cam) => (
+                  {ALL_CAMPUSES_AND_AFFILIATIONS.map((cam) => (
                     <option key={cam} value={cam}>
                       {cam}
                     </option>
@@ -227,6 +319,16 @@ export default function OnboardingPage() {
                 </select>
               </div>
 
+              {selectedCampus === 'Independent / Other' && (
+                <Input
+                  label="Specify Your Institute / Company / Field"
+                  placeholder="e.g. Self-Taught Software Engineer, Freelancer"
+                  value={customCampus}
+                  onChange={(e) => setCustomCampus(e.target.value)}
+                />
+              )}
+
+              {/* Daily Active Window */}
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
                   Daily Active Window

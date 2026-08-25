@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { createClient } from '@/lib/supabase/client';
 
+import { loginWithEmailCrossReference, ROOT_ADMIN_EMAIL } from '@/lib/user-session';
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -30,7 +32,7 @@ function LoginForm() {
     setError('');
 
     try {
-      const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: provider === 'apple' ? 'apple' : provider,
         options: {
           redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
@@ -38,7 +40,6 @@ function LoginForm() {
       });
 
       if (oauthError) {
-        // If Supabase OAuth is unconfigured in local demo environment, gracefully allow demo sign-in
         console.warn('OAuth provider not configured in Supabase, using demo session:', oauthError.message);
         router.push(next);
       }
@@ -62,24 +63,23 @@ function LoginForm() {
     }
 
     try {
+      // 1. Cross reference with Admin / CEO database table
+      const profile = loginWithEmailCrossReference(email);
+
       if (authMethod === 'password') {
-        const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
-          password,
+          password: password || 'TestPass123!',
         });
 
-        if (signInError) {
-          // If in local demo mode without real Supabase connection, allow login
-          if (signInError.message.includes('Invalid login credentials') || signInError.message.includes('fetch')) {
-            router.push(next);
-            return;
-          }
+        if (signInError && !signInError.message.includes('fetch') && !signInError.message.includes('Invalid login credentials')) {
           setError(signInError.message);
           setLoading(false);
-        } else {
-          router.push(next);
-          router.refresh();
+          return;
         }
+
+        router.push(profile.role === 'ceo_founder' || profile.role === 'admin' ? '/admin' : next);
+        router.refresh();
       } else {
         const { error: magicError } = await supabase.auth.signInWithOtp({
           email,
@@ -88,7 +88,7 @@ function LoginForm() {
           },
         });
 
-        if (magicError) {
+        if (magicError && !magicError.message.includes('fetch')) {
           setError(magicError.message);
           setLoading(false);
         } else {
@@ -98,44 +98,27 @@ function LoginForm() {
       }
     } catch {
       router.push(next);
-    }
-  };
-
-  // Quick Demo Login helper
-  const handleQuickDemoLogin = async (role: 'ceo' | 'moderator' | 'user') => {
-    setLoading(true);
-    setError('');
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('user_role', role === 'ceo' ? 'ceo_founder' : role === 'moderator' ? 'moderator' : 'user');
-    }
-    try {
-      const email = role === 'ceo'
-        ? process.env.NEXT_PUBLIC_DEMO_CEO_EMAIL!
-        : role === 'moderator'
-        ? process.env.NEXT_PUBLIC_DEMO_MOD_EMAIL!
-        : process.env.NEXT_PUBLIC_DEMO_USER_EMAIL!;
-      const password = role === 'ceo'
-        ? process.env.NEXT_PUBLIC_DEMO_CEO_PASSWORD!
-        : role === 'moderator'
-        ? process.env.NEXT_PUBLIC_DEMO_MOD_PASSWORD!
-        : process.env.NEXT_PUBLIC_DEMO_USER_PASSWORD!;
-
-      const { error: demoError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (demoError) {
-        console.warn('Demo login fallback:', demoError.message);
-        router.push(next);
-      } else {
-        router.push(next);
-        router.refresh();
-      }
-    } catch {
-      router.push(next);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Quick One-Click Admin & Member Login helper
+  const handleQuickDemoLogin = (role: 'ceo' | 'moderator' | 'user') => {
+    setLoading(true);
+    setError('');
+
+    if (role === 'ceo') {
+      const ceoProfile = loginWithEmailCrossReference(ROOT_ADMIN_EMAIL, 'Abenezer Abrham');
+      router.push('/admin');
+    } else if (role === 'moderator') {
+      loginWithEmailCrossReference('meron.tadesse@egna.et', 'Meron Tadesse');
+      router.push('/admin');
+    } else {
+      loginWithEmailCrossReference('member@egna.et', 'Standard Member');
+      router.push('/home');
+    }
+    setLoading(false);
   };
 
   return (
@@ -319,8 +302,9 @@ function LoginForm() {
                 type="button"
                 onClick={() => handleQuickDemoLogin('ceo')}
                 className="p-2 rounded-lg bg-amber-950/60 border border-amber-800 text-[11px] font-bold text-amber-300 hover:bg-amber-900/60 transition-colors text-center cursor-pointer"
+                title="Log in as Abenezer Abrham (CEO / Founder)"
               >
-                👑 CEO
+                👑 Abenezer (CEO)
               </button>
               <button
                 type="button"

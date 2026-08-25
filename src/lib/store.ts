@@ -4,10 +4,12 @@ import { Profile, Community, Post, Goal, Routine, GoalCheckin, Challenge, Report
 // Default mock Ethiopian users with Sub-city, Verification Badges, and Trust Tier attributes
 export const INITIAL_PROFILES: Profile[] = [
   {
-    id: 'usr-1',
-    username: 'abebe_k',
-    display_name: 'Abebe Kebede',
-    bio: 'Platform Creator & Software engineer building Egna for Ethiopia.',
+    id: 'usr-ceo',
+    username: 'abenezer',
+    display_name: 'Abenezer Abrham',
+    email: 'abenezerabrham61@gmail.com',
+    email_verified: true,
+    bio: 'Platform Founder & Software Engineer building Egna for Ethiopia.',
     avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
     location_region: 'Addis Ababa',
     sub_city: 'Bole',
@@ -15,9 +17,9 @@ export const INITIAL_PROFILES: Profile[] = [
     active_window: 'Early Bird (5 AM – 8 AM)',
     trust_tier: 'tier_3_leader',
     verification_badge: 'ceo_founder',
-    experience_summary: 'Platform Founder & Executive',
+    experience_summary: 'Platform Founder & CEO',
     role: 'ceo_founder',
-    reputation_score: 1250,
+    reputation_score: 2500,
     created_at: new Date(Date.now() - 90 * 86400000).toISOString(),
   },
   {
