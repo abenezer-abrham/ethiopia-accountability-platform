@@ -22,7 +22,8 @@ import {
   Inbox,
   Crown,
   LogOut,
-  Menu
+  Menu,
+  Rocket
 } from 'lucide-react';
 import { Avatar, Badge } from '../ui/Card';
 import { Button } from '../ui/Button';
@@ -138,6 +139,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
   const navItems = [
     { label: t.nav.home, href: '/home', icon: Home },
     { label: t.nav.discover, href: '/discover', icon: Compass },
+    { label: t.nav.launches, href: '/launches', icon: Rocket },
     { label: t.nav.goals, href: '/goals', icon: Target },
     { label: t.nav.activity, href: '/activity', icon: Activity },
     { label: t.nav.messages, href: '/messages', icon: MessageSquare },

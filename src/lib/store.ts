@@ -1,5 +1,5 @@
 export * from './types';
-import { Profile, Community, Post, Goal, Routine, GoalCheckin, Challenge, Report, Squad, VerificationRequest } from './types';
+import { Profile, Community, Post, Goal, Routine, GoalCheckin, Challenge, Report, Squad, VerificationRequest, Launch } from './types';
 
 // Default mock Ethiopian users with Sub-city, Verification Badges, and Trust Tier attributes
 export const INITIAL_PROFILES: Profile[] = [
@@ -439,3 +439,74 @@ export function calculateStreak(checkins: GoalCheckin[], routineId: string): { c
 
   return { currentStreak, longestStreak, completionRate };
 }
+
+// ─── Launches (Founding User Access) ──────────────────────────────────────────
+export const INITIAL_LAUNCHES: Launch[] = [
+  {
+    id: 'launch-1',
+    creator_id: 'usr-ceo',
+    creator_name: 'Abenezer Abrham',
+    creator_avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    creator_badge: 'ceo_founder',
+    name: 'Egna Pro',
+    tagline: "Lifetime founding access to Egna's premium accountability tools.",
+    description: 'Be one of the first 100 founding members of Egna. You get lifetime Pro access, your name in the founding wall, direct access to the CEO for feature requests, and zero ads forever. This is the real ground floor — before it gets big.',
+    category: 'Community',
+    founding_perks: [
+      { label: '🏛️ Founding Wall', description: 'Your name permanently on the Egna founding members wall' },
+      { label: '♾️ Lifetime Pro', description: 'All premium features free — forever, no subscription' },
+      { label: '📞 Direct CEO Access', description: 'Monthly call with Abenezer to shape the roadmap' },
+      { label: '🚫 Zero Ads', description: 'Never see an ad on Egna, guaranteed in writing' },
+    ],
+    founding_price: 500,
+    founding_slots: 100,
+    founding_backers: 7,
+    status: 'active',
+    launched_at: new Date(Date.now() - 2 * 86400000).toISOString(),
+    tags: ['accountability', 'community', 'ethiopia', 'lifetime'],
+  },
+  {
+    id: 'launch-2',
+    creator_id: 'usr-2',
+    creator_name: 'Samuel Alemu',
+    creator_avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    creator_badge: 'verified_partner',
+    name: 'CalisthenicsET',
+    tagline: 'Ethiopia\'s first structured calisthenics coaching platform.',
+    description: 'An online platform to follow progressive calisthenics programs built by Ethiopian coaches, track workouts with your accountability squad, and get form feedback. Founding users get a 6-month premium coaching plan for free and a shoutout on our launch post.',
+    category: 'Course / Learning',
+    founding_perks: [
+      { label: '🏋️ 6-Month Coaching Plan', description: 'Full structured calisthenics program, no cost' },
+      { label: '📣 Launch Shoutout', description: 'Featured on Instagram & Telegram at launch' },
+      { label: '🎖️ OG Badge', description: 'Permanent "OG Member" badge on your profile' },
+    ],
+    founding_price: undefined,
+    founding_slots: 50,
+    founding_backers: 23,
+    status: 'active',
+    launched_at: new Date(Date.now() - 5 * 86400000).toISOString(),
+    tags: ['fitness', 'calisthenics', 'coaching', 'free'],
+  },
+  {
+    id: 'launch-3',
+    creator_id: 'usr-4',
+    creator_name: 'Hiwot Mengistu',
+    creator_avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+    creator_badge: 'verified_org',
+    name: 'ASTU CTF Club Hub',
+    tagline: 'A structured cybersecurity learning hub for Ethiopian university students.',
+    description: 'Practice labs, weekly CTF (Capture The Flag) challenges, and study circle accountability for aspiring Ethiopian cybersecurity engineers. Founding members get access to the private Discord, premium labs, and a certificate of participation.',
+    category: 'Course / Learning',
+    founding_perks: [
+      { label: '🔐 Premium Lab Access', description: 'Full access to Hack The Box-style local labs' },
+      { label: '💬 Private Discord', description: 'Founding members-only channel with direct mentor access' },
+      { label: '📜 Certificate', description: 'Official certificate from ASTU Cybersecurity Club' },
+    ],
+    founding_price: 200,
+    founding_slots: 30,
+    founding_backers: 11,
+    status: 'active',
+    launched_at: new Date(Date.now() - 1 * 86400000).toISOString(),
+    tags: ['cybersecurity', 'ctf', 'university', 'tech'],
+  },
+];

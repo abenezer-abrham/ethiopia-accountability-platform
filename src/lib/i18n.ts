@@ -19,6 +19,7 @@ export interface Translations {
     activity: string;
     messages: string;
     challenges: string;
+    launches: string;
     admin: string;
     squads: string;
     profile: string;
@@ -97,6 +98,7 @@ export const DICTIONARY: Record<AppLanguage, Translations> = {
       activity: 'Activity',
       messages: 'Messages',
       challenges: 'Challenges',
+      launches: 'Launches',
       admin: 'Moderation Admin',
       squads: 'Micro-Squads',
       profile: 'Profile',
@@ -173,6 +175,7 @@ export const DICTIONARY: Record<AppLanguage, Translations> = {
       activity: 'የቅርብ እንቅስቃሴዎች',
       messages: 'መልዕክቶች',
       challenges: 'ውድድሮች',
+      launches: 'ይፋ ማድረጊያ (Launches)',
       admin: 'አስተዳዳሪ ማዕከል',
       squads: 'ንዑስ ቡድኖች (ስኳዶች)',
       profile: 'የግል መገለጫ',
@@ -249,6 +252,7 @@ export const DICTIONARY: Record<AppLanguage, Translations> = {
       activity: 'Sochiiwwan',
       messages: 'Ergaawwan',
       challenges: 'Dorgommiiwwan',
+      launches: 'Eebba (Launches)',
       admin: 'Qindeessaa',
       squads: 'Garee Xixiqqaa',
       profile: 'Eenyummaa',

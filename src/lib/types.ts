@@ -74,6 +74,43 @@ export type ActiveWindow =
   | 'Night Owl (10 PM – 1 AM)'
   | string;
 
+export type LaunchCategory =
+  | 'SaaS / Web App'
+  | 'Mobile App'
+  | 'Course / Learning'
+  | 'Community'
+  | 'Open Source Tool'
+  | 'Content / Newsletter'
+  | 'Physical Product'
+  | 'Service / Agency'
+  | 'Other';
+
+export interface LaunchPerk {
+  label: string;
+  description: string;
+}
+
+export interface Launch {
+  id: string;
+  creator_id: string;
+  creator_name: string;
+  creator_avatar: string;
+  creator_badge: VerificationBadge;
+  name: string;
+  tagline: string;
+  description: string;
+  category: LaunchCategory;
+  logo_url?: string;
+  demo_url?: string;
+  founding_perks: LaunchPerk[];
+  founding_price?: number;        // ETB — undefined means free tier
+  founding_slots?: number;        // max founding users — undefined means unlimited
+  founding_backers: number;       // current backers count
+  status: 'active' | 'funded' | 'closed';
+  launched_at: string;
+  tags: string[];
+}
+
 export interface AdminRecord {
   email: string;
   role: UserRole;
