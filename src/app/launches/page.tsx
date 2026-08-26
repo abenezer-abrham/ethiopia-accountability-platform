@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Rocket, Zap, Users, Star, Lock, CheckCircle, Plus, X, ChevronDown, ChevronUp, Crown, ShieldCheck, BadgeCheck } from 'lucide-react';
+import { Rocket, Zap, Users, Star, Lock, CheckCircle, Plus, X, ChevronDown, ChevronUp, Crown, ShieldCheck, BadgeCheck, ExternalLink } from 'lucide-react';
 import { Card, Badge, Avatar } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input, Textarea } from '@/components/ui/Input';
@@ -107,6 +107,19 @@ function LaunchCard({ launch, onBack }: { launch: Launch; onBack: (id: string) =
             ))}
           </div>
         </div>
+
+        {/* Demo / Live URL */}
+        {launch.demo_url && (
+          <a
+            href={launch.demo_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 px-3 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800 transition-colors w-fit"
+          >
+            <span>Try Live Product / App</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        )}
 
         {/* Tags */}
         <div className="flex flex-wrap gap-1.5">

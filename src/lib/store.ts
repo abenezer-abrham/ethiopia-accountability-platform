@@ -443,6 +443,30 @@ export function calculateStreak(checkins: GoalCheckin[], routineId: string): { c
 // ─── Launches (Founding User Access) ──────────────────────────────────────────
 export const INITIAL_LAUNCHES: Launch[] = [
   {
+    id: 'launch-learnall',
+    creator_id: 'usr-ceo',
+    creator_name: 'Abenezer Abrham',
+    creator_avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    creator_badge: 'ceo_founder',
+    name: 'LearnAll',
+    tagline: 'Master every programming language with interactive study paths & futuristic dashboards.',
+    description: 'LearnAll is an all-in-one developer learning platform where you can master all programming languages from scratch to production. Features structured roadmaps, interactive dashboards, syntax breakdown, and coding challenges. Founding users unlock full lifetime access to all learning tracks, beta features, and direct creator access.',
+    category: 'SaaS / Web App',
+    demo_url: 'https://learnall.freebuff.app/dashboard',
+    founding_perks: [
+      { label: '🚀 All Language Tracks', description: 'Full lifetime access to Python, TypeScript, Rust, Go, C++, Dart & more' },
+      { label: '⚡ Interactive Study Hub', description: 'Immediate beta access to the futuristic learning dashboard at learnall.freebuff.app' },
+      { label: '👑 Founding Contributor Badge', description: 'Permanent founding learner recognition in the community' },
+      { label: '💡 Roadmap Voting Power', description: 'Direct influence on new language frameworks and study circle challenges' },
+    ],
+    founding_price: undefined,
+    founding_slots: 200,
+    founding_backers: 48,
+    status: 'active',
+    launched_at: new Date(Date.now() - 1 * 86400000).toISOString(),
+    tags: ['learnall', 'programming', 'coding', 'web-dev', 'freebuff', 'education'],
+  },
+  {
     id: 'launch-1',
     creator_id: 'usr-ceo',
     creator_name: 'Abenezer Abrham',
